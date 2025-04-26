@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+{
+  "rules": [
+    "INPUT STRUCTURE — Every feature must assume three text-areas that look and feel like document panes: (1) 'Case', (2) 'Question(s)', (3) 'Instructions'. No other input widgets are permitted.",
+    "EXTRACTION PIPELINE — Code must implement: (a) fact & keyword extraction from the Case and Question; (b) conceptual mapping against the external Knowledge-Base JSON; (c) template assembly; (d) natural-language rendering.",
+    "CATEGORY DISCIPLINE — All extracted tokens are tagged strictly as one of {StrategicTheory, BusinessConcept, IndustryContext}. Never invent new categories.",
+    "THEORY WHITELIST — StrategicTheory tags may only be TCE, RBV, ResidualControlRights, PlatformStrategy, DemandSideDisruption, ArchitecturalDisruption.",
+    "MAPPING LOGIC — If a theory term (e.g., 'asset specificity') is absent but a semantically equivalent description exists, map it and log {source_phrase, mapped_theory}.",
+    "KNOWLEDGE_BASE_PATH — Load the concept dictionary from 'data/knowledge_base.py'.",
+    "KB FORMAT — knowledge_base must be a dict[str, dict[str, str|None]].",
+    "OUTPUT LIMITS — Default answers ≤500 words unless overridden; hard-clamp 550.",
+    "TONE — Responses must read like a Rotman MBA student (concise, analytical, no AI verbiage).",
+    "EXPORT — Provide download_answer() that writes .docx and .txt locally; no cloud calls.",
+    "TECH STACK — Python 3.11; fastapi for the local server; typer for CLI; spaCy, python-docx, jinja2, uvicorn, pytest allowed; no network-bound libs.",
+    "UNIT TESTS — Include tests for extraction, mapping, word-count guard, and e2e generation."
+  ]
+}

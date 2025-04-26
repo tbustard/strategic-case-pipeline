@@ -1,0 +1,4 @@
+{{CONCEPT_SENTENCES}}
+
+Analysis:
+Architectural Disruption theory suggests that new technologies can enable modular product architectures that challenge integrated incumbents. 
