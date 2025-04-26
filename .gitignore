@@ -1,4 +1,4 @@
- HEAD
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -180,5 +180,9 @@ __pycache__/
 # Python virtual environment
 .venv/ 
 .DS_Store
+
 **/.DS_Store 
- e59e244 (chore: ignore .DS_Store files)
+
+case_context/.DS_Store
+src/.DS_Store
+39c6ff9 (chore: remove .DS_Store files and ignore them)
