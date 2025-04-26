@@ -1,4 +1,5 @@
 
+
 # spaCy-optimization
 
 # Strategic-Case Auto-Writer
@@ -65,11 +66,10 @@ streamlit run app.py
 - Modular design for easy maintenance
 - Comprehensive test coverage
 
+ c940e4f (feat: spaCy select_pipes optimization and test additions)
 ## Performance
 
-### spaCy Pipeline Optimization
-
-The semantic matching pipeline has been optimized by disabling unnecessary components. Benchmark results show:
+spaCy pipeline optimization bench:
 
 ```bash
 Generating sample texts...
@@ -79,12 +79,24 @@ Benchmarking full pipeline...
 Benchmarking optimized pipeline...
 
 Results:
-Full pipeline: 0.0123s per doc (total: 1.23s)
-Optimized pipeline: 0.0045s per doc (total: 0.45s)
-Speedup: 2.73x
+Full pipeline:      0.0031s per doc (total: 0.31s)
+Optimized pipeline: 0.0012s per doc (total: 0.12s)
+Speedup:            2.46×
 ```
 
 The optimized pipeline:
+<<<<<<< HEAD
 - Keeps only `tok2vec` and `lemmatizer` components
 - Achieves ~2.7x speedup on average
 - Maintains semantic matching accuracy while reducing processing time
+
+
+- Keeps only the `tok2vec` component (pure vector-based matching).
+- Uses `nlp.select_pipes(disable=...)` to disable all other components.
+- Achieves ~2.5× speedup while maintaining semantic matching accuracy.
+
+To rerun benchmarks:
+```bash
+python bench_speed.py
+```
+ c940e4f (feat: spaCy select_pipes optimization and test additions)

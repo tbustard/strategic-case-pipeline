@@ -1,14 +1,19 @@
 """Text extraction and NLP processing module."""
 
 import logging
-from typing import TypedDict, List
-# import spacy  # No longer needed directly
+from typing import TypedDict, List, Optional
+import spacy
 from spacy.tokens import Doc
+from spacy.language import Language
 
 from case_context.config import SPACY_MODEL
 from bench_speed import get_optimized_nlp
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+_nlp: Optional[Language] = None
 
 class ExtractedFacts(TypedDict):
     """Structure for extracted business-relevant information."""
@@ -16,13 +21,20 @@ class ExtractedFacts(TypedDict):
     noun_chunks: List[str]
     business_verbs: List[str]
 
-def load_nlp_model() -> spacy.language.Language:
+def load_nlp_model() -> Language:
     """Load and cache the spaCy model with optimized pipeline."""
-    if not hasattr(load_nlp_model, "nlp"):
-        logger.info(f"Loading spaCy model: {SPACY_MODEL}")
-        nlp = get_optimized_nlp()
-        load_nlp_model.nlp = nlp
-    return load_nlp_model.nlp
+    global _nlp
+    if _nlp is None:
+        try:
+            logger.info(f"Loading spaCy model: {SPACY_MODEL}")
+            _nlp = get_optimized_nlp()
+            logger.info("Loaded optimized spaCy pipeline: %s", _nlp.pipe_names)
+        except OSError:
+            logger.error(
+                f"Model {SPACY_MODEL} not found. Please run: python -m spacy download {SPACY_MODEL}"
+            )
+            raise
+    return _nlp
 
 def extract_business_facts(text: str) -> ExtractedFacts:
     """

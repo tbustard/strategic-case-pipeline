@@ -34,11 +34,18 @@ def generate_sample_texts(n: int = 100) -> List[str]:
     ]
 
 def get_optimized_nlp() -> spacy.language.Language:
-    """Load spaCy model with only tok2vec for semantic matching."""
+    """
+    Load the configured spaCy model and prune its pipeline to only 'tok2vec'
+    for fast semantic matching. Uses `nlp.select_pipes(disable=...)` to disable
+    all other components, minimizing computation and avoiding deprecation
+    warnings from `disable_pipes()`. This ensures only vector-based similarity
+    checks are performed.
+    """
+
     nlp = spacy.load(SPACY_MODEL)
     # Disable all pipes except tok2vec
     pipes_to_disable = [pipe for pipe in nlp.pipe_names if pipe != "tok2vec"]
-    nlp.disable_pipes(pipes_to_disable)
+    nlp.select_pipes(disable=pipes_to_disable)
     return nlp
 
 def benchmark_pipeline(nlp, texts: List[str]) -> Tuple[float, float]:

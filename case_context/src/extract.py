@@ -6,7 +6,8 @@ import spacy
 from spacy.tokens import Doc
 from spacy.language import Language
 
-from config import SPACY_MODEL
+from case_context.config import SPACY_MODEL
+from bench_speed import get_optimized_nlp
 
 logger = logging.getLogger(__name__)
 
@@ -19,21 +20,12 @@ class ExtractedFacts(TypedDict):
     business_verbs: List[str]
 
 def load_nlp_model() -> Language:
-    """
-    Load and return the spaCy NLP model (caching so it's loaded only once).
-
-    Note: uses the `en_core_web_sm` model specified in config.
-    """
-    global _nlp
-    if _nlp is None:
-        try:
-            _nlp = spacy.load(SPACY_MODEL)
-        except OSError:
-            logger.error(
-                f"Model {SPACY_MODEL} not found. Please run: python -m spacy download {SPACY_MODEL}"
-            )
-            raise
-    return _nlp
+    """Load and cache the spaCy model with optimized pipeline."""
+    if not hasattr(load_nlp_model, "nlp"):
+        logger.info(f"Loading spaCy model: {SPACY_MODEL}")
+        nlp = get_optimized_nlp()
+        load_nlp_model.nlp = nlp
+    return load_nlp_model.nlp
 
 def extract_business_facts(text: str) -> ExtractedFacts:
     """
