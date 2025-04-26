@@ -1,8 +1,16 @@
 """Template selection and answer generation module."""
 
 import logging
+from pathlib import Path
 from typing import Dict, List, Optional
+from jinja2 import Environment, FileSystemLoader
 from case_context.config import TEMPLATES_DIR, MAX_OUTPUT_WORDS
+from case_context.extract import process_case_text, extract_business_facts
+from case_context.map import map_concepts, ConceptMatch
+
+# Set up template environment
+TEMPLATE_DIR = Path(__file__).parent / "templates"
+env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
 
 logger = logging.getLogger(__name__)
 
@@ -121,3 +129,28 @@ def generate_answer(
         answer = " ".join(words[:word_limit]) + "..."
 
     return answer
+
+def assemble_answer(case_text: str, question_text: str) -> str:
+    """Assemble an answer by extracting and mapping concepts from case text.
+    
+    Args:
+        case_text: The main case study text
+        question_text: The question to be answered
+        
+    Returns:
+        A structured string containing detected concepts and their definitions
+    """
+    # 1. Extract facts
+    case_facts, question_facts = process_case_text(case_text, question_text)
+    
+    # 2. Map to concepts
+    case_matches = map_concepts(case_facts)
+    question_matches = map_concepts(question_facts)
+    
+    # 3. Combine and sort matches (question matches first)
+    all_matches = question_matches + [m for m in case_matches if m not in question_matches]
+    
+    # 4. Load and render template
+    template = env.get_template("answer.j2")
+    
+    return template.render(matches=all_matches[:5])  # Show top 5 matches

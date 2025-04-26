@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from case_context.assemble import build_concept_sentences, generate_answer, load_template
+from case_context.assemble import build_concept_sentences, generate_answer, load_template, assemble_answer
 
 def test_build_concept_sentences():
     """Test building concept sentences from mapped concepts."""
@@ -51,4 +51,27 @@ def test_generate_answer():
     # Check word limit enforcement
     long_answer = generate_answer(templates, mapped_concepts, word_limit=10)
     assert len(long_answer.split()) <= 10
-    assert long_answer.endswith("...") 
+    assert long_answer.endswith("...")
+
+def test_assemble_simple_case():
+    """Test that assemble_answer detects and returns known concepts."""
+    # Sample case and question text
+    case_text = "Apple Inc. leverages its strong brand and ecosystem to create network effects."
+    question_text = "How does Apple create competitive advantage?"
+    
+    # Get assembled answer
+    answer = assemble_answer(case_text, question_text)
+    
+    # Check that we got a non-empty string with expected format
+    assert isinstance(answer, str)
+    assert len(answer) > 0
+    assert "The following strategic concepts are most relevant:" in answer
+    
+    # Check that we detected at least one known concept
+    assert "Competitive Advantage" in answer
+    
+    # Check that the answer includes concept definitions
+    assert "match" in answer.lower()
+    
+    # Check that question-oriented matches appear first
+    assert answer.find("Competitive Advantage") < answer.find("Dynamic Capabilities") 

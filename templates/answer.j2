@@ -1,0 +1,6 @@
+The following strategic concepts are most relevant:
+
+{% for match in matches %}
+- **{{ match.concept.name }}** ({{ match.method }} match "{{ match.matched_text }}"):  
+  {{ match.concept.definition }}
+{% endfor %} 

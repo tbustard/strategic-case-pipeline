@@ -17,7 +17,7 @@ DEFAULT_THEME: Final[str] = "light"
 SPACY_MODEL: Final[str] = "en_core_web_md"
 SPACY_MODEL_VERSION: Final[str] = "3.7.2"
 FUZZY_THRESHOLD: Final[float] = 80.0  # Minimum fuzzy match score (0-100)
-SEMANTIC_THRESHOLD: Final[float] = 0.7  # Minimum semantic similarity score (0-1)
+SEMANTIC_THRESHOLD: Final[float] = 0.5  # Minimum semantic similarity score (0-1)
 
 # Logging
 LOG_LEVEL: Final[str] = "INFO"

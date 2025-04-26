@@ -23,16 +23,54 @@ except ImportError:
 
 import logging
 from pathlib import Path
+from typing import Dict, List
 
-from case_context.extract import process_case_text
-from case_context.map import analyze_case_context, identify_relevant_theories
-from case_context.assemble import select_templates, generate_answer
+import spacy
+from spacy.language import Language
+
+from case_context.extract import process_case_text, extract_business_facts
+from case_context.map import analyze_case_context, identify_relevant_theories, map_concepts
+from case_context.assemble import select_templates, generate_answer, assemble_analysis
 from case_context.export import export_to_docx
-from case_context.config import LOG_LEVEL, LOG_FORMAT
+from case_context.config import LOG_LEVEL, LOG_FORMAT, load_config
 
 # Configure logging
 logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
+
+def analyze_case(
+    case_text: str,
+    question_text: str,
+    nlp: Language = None
+) -> Dict[str, List[str]]:
+    """Analyze a case and question to identify relevant strategic concepts.
+    
+    Args:
+        case_text: The case text to analyze
+        question_text: The question text to analyze
+        nlp: Optional pre-loaded spaCy model
+        
+    Returns:
+        Dictionary containing analysis results by category
+    """
+    logger.info("Starting case analysis")
+    
+    # Load spaCy model if not provided
+    if nlp is None:
+        nlp = spacy.load("en_core_web_sm")
+    
+    # Extract facts from both texts
+    case_facts = extract_business_facts(case_text, nlp)
+    question_facts = extract_business_facts(question_text, nlp)
+    
+    # Map facts to concepts
+    case_matches = map_concepts(case_facts, nlp)
+    question_matches = map_concepts(question_facts, nlp)
+    
+    # Assemble analysis
+    analysis = assemble_analysis(case_matches, question_matches)
+    
+    return analysis
 
 def main():
     """Main application function."""

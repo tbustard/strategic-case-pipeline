@@ -1,64 +1,48 @@
-"""Knowledge base of strategic management concepts and theories."""
+"""Knowledge base module containing strategic management concepts."""
 
-from typing import TypedDict, Literal, Optional
+from dataclasses import dataclass
+from typing import Optional
 
-Category = Literal["Strategic_Theory", "Business_Concept", "Industry_Context"]
+@dataclass
+class Concept:
+    """A strategic management concept."""
+    name: str
+    category: str
+    theory: Optional[str] = None
 
-class Concept(TypedDict):
-    category: Category
-    theory: Optional[str]
-    description: str
-
-# Sample knowledge base entries
-KNOWLEDGE_BASE: dict[str, Concept] = {
-    "transaction cost": {
-        "category": "Strategic_Theory",
-        "theory": "TCE",
-        "description": "Transaction Cost Economics - analyzing costs of market transactions"
-    },
-    "resource based view": {
-        "category": "Strategic_Theory",
-        "theory": "RBV",
-        "description": "Resource-Based View - competitive advantage from unique resources"
-    },
-    "platform": {
-        "category": "Business_Concept",
-        "theory": None,
-        "description": "Digital platform business model"
-    },
-    "network effects": {
-        "category": "Business_Concept",
-        "theory": None,
-        "description": "Value increases with more users"
-    },
-    "barriers to entry": {
-        "category": "Business_Concept",
-        "theory": None,
-        "description": "Obstacles preventing new competitors"
-    },
-    "competitive advantage": {
-        "category": "Business_Concept",
-        "theory": None,
-        "description": "Superior position in market"
-    },
-    "value chain": {
-        "category": "Business_Concept",
-        "theory": None,
-        "description": "Sequence of activities creating value"
-    },
-    "market share": {
-        "category": "Industry_Context",
-        "theory": None,
-        "description": "Percentage of total market sales"
-    },
-    "industry structure": {
-        "category": "Industry_Context",
-        "theory": None,
-        "description": "Organization of market participants"
-    },
-    "regulatory environment": {
-        "category": "Industry_Context",
-        "theory": None,
-        "description": "Government rules affecting industry"
-    }
-} 
+# Initial knowledge base with core strategic management concepts
+KNOWLEDGE_BASE = [
+    # Transaction Cost Economics concepts
+    Concept("Transaction Cost Economics", "Economics", "TCE"),
+    Concept("Asset Specificity", "Economics", "TCE"),
+    Concept("Opportunism", "Economics", "TCE"),
+    Concept("Governance Structure", "Economics", "TCE"),
+    Concept("Make or Buy Decision", "Economics", "TCE"),
+    
+    # Resource Based View concepts
+    Concept("Resource-Based View", "Strategy", "RBV"),
+    Concept("Core Competency", "Strategy", "RBV"),
+    Concept("Competitive Advantage", "Strategy", "RBV"),
+    Concept("VRIO Framework", "Strategy", "RBV"),
+    Concept("Dynamic Capabilities", "Strategy", "RBV"),
+    
+    # Platform Strategy concepts
+    Concept("Platform Strategy", "Strategy", "PlatformStrategy"),
+    Concept("Network Effects", "Strategy", "PlatformStrategy"),
+    Concept("Multi-sided Platform", "Strategy", "PlatformStrategy"),
+    Concept("Platform Ecosystem", "Strategy", "PlatformStrategy"),
+    
+    # Disruption concepts
+    Concept("Disruptive Innovation", "Strategy", "DemandSideDisruption"),
+    Concept("Low-end Disruption", "Strategy", "DemandSideDisruption"),
+    Concept("New-market Disruption", "Strategy", "DemandSideDisruption"),
+    Concept("Architectural Innovation", "Strategy", "ArchitecturalDisruption"),
+    Concept("Modular Innovation", "Strategy", "ArchitecturalDisruption"),
+    
+    # General business concepts
+    Concept("Market Entry", "BusinessConcept"),
+    Concept("Market Share", "BusinessConcept"),
+    Concept("Value Chain", "BusinessConcept"),
+    Concept("Industry Structure", "BusinessConcept"),
+    Concept("Barriers to Entry", "BusinessConcept"),
+] 
