@@ -7,6 +7,7 @@ from config import TEMPLATES_DIR, MAX_OUTPUT_WORDS
 
 logger = logging.getLogger(__name__)
 
+
 def build_concept_sentences(mapped_concepts: Dict[str, List[Dict]]) -> str:
     """
     Turn mapped_concepts into human-readable sentences.
@@ -29,20 +30,19 @@ def build_concept_sentences(mapped_concepts: Dict[str, List[Dict]]) -> str:
             if not cat_name.endswith("concepts"):
                 cat_name += " concepts"
             sentences.append(
-                f"In this case, the {cat_name} include: "
-                + ", ".join(names)
-                + "."
+                f"In this case, the {cat_name} include: " + ", ".join(names) + "."
             )
     return " ".join(sentences)
+
 
 def load_template(theory: str, section: str) -> Optional[str]:
     """
     Load a template for a specific theory and section.
-    
+
     Args:
         theory: Name of the strategic theory
         section: Section type (intro, analysis, conclusion)
-        
+
     Returns:
         Template text if found, None otherwise
     """
@@ -53,13 +53,14 @@ def load_template(theory: str, section: str) -> Optional[str]:
         logger.warning(f"Template not found: {template_path}")
         return None
 
+
 def select_templates(theories: List[str]) -> Dict[str, Dict[str, str]]:
     """
     Select appropriate templates for each theory.
-    
+
     Args:
         theories: List of relevant strategic theories
-        
+
     Returns:
         Dictionary of templates by theory and section
     """
@@ -74,19 +75,20 @@ def select_templates(theories: List[str]) -> Dict[str, Dict[str, str]]:
             templates[theory] = theory_templates
     return templates
 
+
 def generate_answer(
     templates: Dict[str, Dict[str, str]],
     mapped_concepts: Dict[str, List[Dict]],
-    word_limit: int = MAX_OUTPUT_WORDS
+    word_limit: int = MAX_OUTPUT_WORDS,
 ) -> str:
     """
     Generate the final answer by combining templates and case-specific content.
-    
+
     Args:
         templates: Selected templates by theory and section
         mapped_concepts: Mapped concepts by category
         word_limit: Maximum word count for the answer
-        
+
     Returns:
         Generated answer text
     """

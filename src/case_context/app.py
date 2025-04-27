@@ -1,154 +1,153 @@
-"""Main application entry point with Streamlit UI."""
+#!/usr/bin/env python3
+"""Command-line interface for case analysis."""
 
-import streamlit as st
-
-# Initial page configuration
-st.set_page_config(
-    page_title="Strategic-Case Auto-Writer",
-    page_icon="📝",
-    layout="wide"
-)
-
-# Pre-flight dependency check
-try:
-    import rapidfuzz
-except ImportError:
-    st.error(
-        "⚠️ Missing dependency: **rapidfuzz**.\n\n"
-        "Please run:\n\n"
-        "    pip install rapidfuzz>=2.13.7\n\n"
-        "in this environment, then restart the app."
-    )
-    st.stop()
-
-import logging
+import sys
+import click
 from pathlib import Path
-from typing import Dict, List
+from typing import Optional
+from case_context.assemble import assemble_answer
 
-import spacy
-from spacy.language import Language
 
-from case_context.extract import process_case_text, extract_business_facts
-from case_context.map import analyze_case_context, identify_relevant_theories, map_concepts
-from case_context.assemble import select_templates, generate_answer, assemble_analysis
-from case_context.export import export_to_docx
-from case_context.config import LOG_LEVEL, LOG_FORMAT, load_config
+def validate_inputs(
+    case_file: Optional[str],
+    question_file: Optional[str],
+    case_text: Optional[str],
+    question_text: Optional[str],
+) -> None:
+    """Validate input combinations and file existence.
 
-# Configure logging
-logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
-logger = logging.getLogger(__name__)
-
-def analyze_case(
-    case_text: str,
-    question_text: str,
-    nlp: Language = None
-) -> Dict[str, List[str]]:
-    """Analyze a case and question to identify relevant strategic concepts.
-    
     Args:
-        case_text: The case text to analyze
-        question_text: The question text to analyze
-        nlp: Optional pre-loaded spaCy model
-        
-    Returns:
-        Dictionary containing analysis results by category
-    """
-    logger.info("Starting case analysis")
-    
-    # Load spaCy model if not provided
-    if nlp is None:
-        nlp = spacy.load("en_core_web_sm")
-    
-    # Extract facts from both texts
-    case_facts = extract_business_facts(case_text, nlp)
-    question_facts = extract_business_facts(question_text, nlp)
-    
-    # Map facts to concepts
-    case_matches = map_concepts(case_facts, nlp)
-    question_matches = map_concepts(question_facts, nlp)
-    
-    # Assemble analysis
-    analysis = assemble_analysis(case_matches, question_matches)
-    
-    return analysis
+        case_file: Path to case file
+        question_file: Path to question file
+        case_text: Direct case text
+        question_text: Direct question text
 
-def main():
-    """Main application function."""
-    st.title("Strategic-Case Auto-Writer")
-    st.markdown("""
-    Analyze case studies and generate strategic insights using AI-powered text analysis.
-    """)
-    
-    # Input sections
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Case Text")
-        case_text = st.text_area(
-            "Paste the case study text here",
-            height=300,
-            key="case_text"
+    Raises:
+        click.UsageError: If input combination is invalid
+    """
+    # Check for mixed input modes
+    if case_file and case_text:
+        raise click.UsageError(
+            "Please provide either a case file path or direct text input, but not both."
         )
-    
-    with col2:
-        st.subheader("Question(s)")
-        question_text = st.text_area(
-            "Enter the question(s) to analyze",
-            height=300,
-            key="question_text"
+    if question_file and question_text:
+        raise click.UsageError(
+            "Please provide either a question file path or direct text input, but not both."
         )
-    
-    st.subheader("Additional Instructions")
-    instructions = st.text_area(
-        "Optional: Add any specific instructions or constraints",
-        height=100,
-        key="instructions"
+
+    # Check that we have at least one input mode for each
+    if not (case_file or case_text):
+        raise click.UsageError(
+            "Please provide either a case file path or direct case text."
+        )
+    if not (question_file or question_text):
+        raise click.UsageError(
+            "Please provide either a question file path or direct question text."
+        )
+
+    # Check file existence
+    if case_file and not Path(case_file).exists():
+        raise click.UsageError(
+            f"File not found: {case_file}\n"
+            "Please provide a valid path to your case file "
+            "(e.g. Data/Case.docx or cases/Case1.txt)."
+        )
+    if question_file and not Path(question_file).exists():
+        raise click.UsageError(
+            f"File not found: {question_file}\n"
+            "Please provide a valid path to your question file "
+            "(e.g. Data/Question_1.txt)."
+        )
+
+
+@click.command(
+    help="""
+Analyze a business case and generate a structured answer.
+
+Two modes of operation:
+1. File-based input:   Provide paths to case and question files
+2. Direct text input:  Paste case and question text directly using --case-text/--question-text
+
+Example (file-based):
+    python -m case_context.app Data/Case.docx Data/Question_1.txt
+
+Example (direct input):
+    python -m case_context.app --case-text "..." --question-text "..."
+"""
+)
+@click.argument("case_file", type=str, required=False)
+@click.argument("question_file", type=str, required=False)
+@click.option(
+    "--case-text", help="Paste the case text directly instead of supplying a file"
+)
+@click.option(
+    "--question-text",
+    help="Paste the question text directly instead of supplying a file",
+)
+@click.option(
+    "--instructions",
+    help="Professor's guiding instructions for format and content",
+    required=False,
+    default=None,
+)
+@click.option(
+    "--user-inputs",
+    help="Any extra context or parameters",
+    required=False,
+    default=None,
+)
+@click.option(
+    "--style-instructions",
+    help="Tone/style adjustments (e.g., 'student-like, less robotic')",
+    required=False,
+    default=None,
+)
+def main(
+    case_file: Optional[str],
+    question_file: Optional[str],
+    case_text: Optional[str],
+    question_text: Optional[str],
+    instructions: Optional[str],
+    user_inputs: Optional[str],
+    style_instructions: Optional[str],
+) -> None:
+    """Analyze a case and answer a question about it."""
+    # Validate inputs
+    validate_inputs(case_file, question_file, case_text, question_text)
+
+    # Prompt for missing inputs
+    if instructions is None:
+        instructions = click.prompt("Answer instructions")
+    if user_inputs is None:
+        user_inputs = click.prompt("Additional user inputs")
+    if style_instructions is None:
+        style_instructions = click.prompt("Rewrite instructions")
+
+    # Get input texts
+    if case_text:
+        case_content = case_text
+    else:
+        case_content = Path(case_file).read_text()
+
+    if question_text:
+        question_content = question_text
+    else:
+        question_content = Path(question_file).read_text()
+
+    # Get assembled answer
+    answer = assemble_answer(
+        case_text=case_content,
+        question_text=question_content,
+        instructions_text=instructions,
+        user_inputs_text=user_inputs,
+        style_instructions=style_instructions,
     )
-    
-    # Process button
-    if st.button("Generate Analysis"):
-        if not case_text or not question_text:
-            st.error("Please provide both case text and question(s)")
-            return
-        
-        with st.spinner("Analyzing case and generating insights..."):
-            try:
-                # Extract facts
-                case_facts, question_facts = process_case_text(case_text, question_text)
-                
-                # Map concepts
-                mapped_concepts = analyze_case_context(case_facts, question_facts)
-                
-                # Identify theories
-                theories = identify_relevant_theories(
-                    [concept for concepts in mapped_concepts.values() for concept in concepts]
-                )
-                
-                # Select templates
-                templates = select_templates(theories)
-                
-                # Generate answer
-                answer = generate_answer(templates, mapped_concepts)
-                
-                # Display results
-                st.subheader("Generated Analysis")
-                st.write(answer)
-                
-                # Export options
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("Copy to Clipboard"):
-                        st.code(answer)
-                        st.success("Copied to clipboard!")
-                
-                with col2:
-                    if st.button("Export to DOCX"):
-                        output_path = export_to_docx(answer)
-                        st.success(f"Exported to {output_path}")
-                
-            except Exception as e:
-                logger.error(f"Error during analysis: {e}")
-                st.error(f"An error occurred: {str(e)}")
+
+    # Print results
+    click.echo("\nAnalysis Results:")
+    click.echo("----------------")
+    click.echo(answer)
+
 
 if __name__ == "__main__":
-    main() 
+    main()

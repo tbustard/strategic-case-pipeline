@@ -13,4 +13,4 @@ setup(
         "rapidfuzz>=2.13.7",
     ],
     python_requires=">=3.9",
-) 
+)

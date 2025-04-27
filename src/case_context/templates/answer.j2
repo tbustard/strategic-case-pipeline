@@ -1,6 +1,24 @@
-The following strategic concepts are most relevant:
-
+## Strategic Concepts
+{% if matches %}
 {% for match in matches %}
-- **{{ match.concept.name }}** ({{ match.method }} match "{{ match.matched_text }}"):  
-  {{ match.concept.definition }}
-{% endfor %} 
+{{ match.concept }} ({{ "%.0f"|format(match.score) }}% match): {{ match.definition }}
+{% endfor %}
+{% else %}
+No strategic concepts were detected. Please broaden your question or lower matching thresholds.
+{% endif %}
+
+## Case-Specific Evidence
+{% if matches %}
+{% for match in matches %}
+{{ match.matched_text }}
+{% endfor %}
+{% endif %}
+
+## Additional Context
+{% if instructions_text %}
+{{ instructions_text }}
+{% endif %}
+
+{% if user_inputs_text %}
+{{ user_inputs_text }}
+{% endif %} 

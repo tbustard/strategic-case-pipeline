@@ -26,4 +26,4 @@ LOG_FORMAT: Final[str] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 # Ensure directories exist
 for directory in [TEMPLATES_DIR, TESTS_DIR]:
-    directory.mkdir(exist_ok=True) 
+    directory.mkdir(exist_ok=True)
