@@ -13,4 +13,4 @@ setup(
         "python-dotenv==1.0.1",
         "rapidfuzz>=2.13.7",
     ],
-) 
+)

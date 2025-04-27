@@ -12,40 +12,39 @@ from case_context.config import OUTPUT_DIR
 
 logger = logging.getLogger(__name__)
 
+
 def export_to_docx(
-    answer: str,
-    output_path: Optional[Path] = None,
-    title: str = "Strategic Analysis"
+    answer: str, output_path: Optional[Path] = None, title: str = "Strategic Analysis"
 ) -> Path:
     """
     Export the generated answer to a DOCX file.
-    
+
     Args:
         answer: The generated answer text
         output_path: Optional path for the output file
         title: Title for the document
-        
+
     Returns:
         Path to the created document
     """
     if output_path is None:
         output_path = Path(f"{title.lower().replace(' ', '_')}.docx")
-    
+
     doc = Document()
-    
+
     # Add title
     title_para = doc.add_paragraph()
     title_run = title_para.add_run(title)
     title_run.bold = True
     title_run.font.size = Pt(16)
     title_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-    
+
     # Add answer paragraphs, preserving line breaks
     for block in answer.split("\n\n"):
         cleaned = block.strip()
         if cleaned:
             para = doc.add_paragraph(cleaned)
-    
+
     try:
         doc.save(output_path)
         logger.info(f"Exported document to {output_path}")

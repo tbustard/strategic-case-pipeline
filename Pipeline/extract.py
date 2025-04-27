@@ -68,6 +68,7 @@ def _build_indices() -> None:
 # Build on import
 _build_indices()
 
+
 # --------------------------------------------------------------------
 # Public API
 # --------------------------------------------------------------------
@@ -110,6 +111,10 @@ def extract_tags(text: str) -> List[Tag]:
 # Simple CLI helper ---------------------------------------------------
 if __name__ == "__main__":
     import sys
-    sample_text = " ".join(sys.argv[1:]) or "Terra's Phoenix factory faces supplier hold‑up risks."
+
+    sample_text = (
+        " ".join(sys.argv[1:])
+        or "Terra's Phoenix factory faces supplier hold‑up risks."
+    )
     for tag in extract_tags(sample_text):
         print(tag)

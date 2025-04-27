@@ -2,7 +2,7 @@
 line-length = 88
 target-version = ['py39']
 include = '\.pyi?$'
-
+ 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

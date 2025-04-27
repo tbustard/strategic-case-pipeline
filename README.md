@@ -1,5 +1,3 @@
-
-
 # spaCy-optimization
 
 # Strategic-Case Auto-Writer
@@ -85,11 +83,10 @@ Speedup:            2.46×
 ```
 
 The optimized pipeline:
-<<<<<<< HEAD
+
 - Keeps only `tok2vec` and `lemmatizer` components
 - Achieves ~2.7x speedup on average
 - Maintains semantic matching accuracy while reducing processing time
-
 
 - Keeps only the `tok2vec` component (pure vector-based matching).
 - Uses `nlp.select_pipes(disable=...)` to disable all other components.
@@ -100,3 +97,48 @@ To rerun benchmarks:
 python bench_speed.py
 ```
  c940e4f (feat: spaCy select_pipes optimization and test additions)
+
+# Case Context Analysis Pipeline
+
+A Python tool for analyzing business case studies and generating structured answers based on strategic theories.
+
+## Usage
+
+### File-based input
+```bash
+python -m case_context.app Data/Case.docx Data/Question_1.txt \
+  --instructions "Focus on core strategic concepts" \
+  --user-inputs "Consider market dynamics" \
+  --style-instructions "Make it student-like"
+```
+
+### Direct-text input
+```bash
+python -m case_context.app \
+  --case-text "$(cat Data/Case.docx)" \
+  --question-text "What core theory explains this strategy?" \
+  --instructions "Focus on core strategic concepts" \
+  --user-inputs "Consider market dynamics" \
+  --style-instructions "Make it student-like"
+```
+
+## Features
+- Fact & keyword extraction from case text
+- Conceptual mapping against knowledge base
+- Template-based answer assembly
+- Style/tone customization
+- Support for both file and direct text input
+
+## Installation
+```bash
+pip install -r requirements.txt
+```
+
+## Development
+```bash
+# Run tests
+pytest
+
+# Run with coverage
+pytest --cov=src/case_context
+```
